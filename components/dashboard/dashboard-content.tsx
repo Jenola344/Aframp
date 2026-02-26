@@ -8,7 +8,10 @@ import { TransactionHistory } from '@/components/dashboard/transaction-history'
 import { SwapModal } from '@/components/dashboard/swap-modal'
 import { SendModal } from '@/components/dashboard/send-modal'
 import { ReceiveModal } from '@/components/dashboard/receive-modal'
+import { TrendingAssets } from '@/components/dashboard/trending-assets'
+import { AddToWatchlistModal } from '@/components/dialogs/add-to-watchlist-modal'
 import { useBalanceContext } from '@/contexts/balance-context'
+import { Asset } from '@/types/balance'
 
 interface DashboardContentProps {
   walletName: string
@@ -16,7 +19,7 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ walletName, walletAddress }: DashboardContentProps) {
-  const [activeModal, setActiveModal] = useState<'swap' | 'send' | 'receive' | null>(null)
+  const [activeModal, setActiveModal] = useState<'swap' | 'send' | 'receive' | 'add-watchlist' | null>(null)
 
   // Get all balances with prices from context
   const { balances, totalUsdValue, lastUpdated } = useBalanceContext()
@@ -61,6 +64,13 @@ export function DashboardContent({ walletName, walletAddress }: DashboardContent
         onReceive={() => setActiveModal('receive')}
       />
 
+      {/* Trending Assets */}
+      <TrendingAssets
+        onAddToWatchlist={() => {
+          setActiveModal('add-watchlist')
+        }}
+      />
+
       {/* Transaction History */}
       <TransactionHistory />
 
@@ -75,6 +85,10 @@ export function DashboardContent({ walletName, walletAddress }: DashboardContent
       />
       <ReceiveModal
         open={activeModal === 'receive'}
+        onOpenChange={(open) => !open && setActiveModal(null)}
+      />
+      <AddToWatchlistModal
+        open={activeModal === 'add-watchlist'}
         onOpenChange={(open) => !open && setActiveModal(null)}
       />
     </div>

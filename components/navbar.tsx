@@ -69,6 +69,12 @@ export function Navbar() {
           >
             Offramp
           </Link>
+          <Link
+            href="/watchlist"
+            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Watchlist
+          </Link>
         </div>
 
         {/* Right side: Theme Toggle and Connect Button */}
@@ -120,6 +126,14 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Sell Crypto (Offramp)
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/watchlist"
+              className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors flex items-center justify-between"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              My Watchlist
               <ArrowRight className="w-4 h-4" />
             </Link>
             <hr className="border-border my-2" />
