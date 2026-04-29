@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import { Keypair } from '@stellar/stellar-sdk'
+import { walletSession } from '@/lib/wallet/session'
 
 declare global {
   interface Window {
@@ -16,6 +18,8 @@ interface WalletProvider {
   name: string
 }
 
+const STELLAR_WALLET_IDS = ['freighter', 'lobstr', 'stellar-xlm']
+
 export const useWalletConnect = () => {
   const router = useRouter()
 
@@ -24,11 +28,9 @@ export const useWalletConnect = () => {
     if (['trust-wallet', 'walletconnect', 'coinbase-wallet'].includes(walletId)) {
       return `0x${Math.random().toString(16).slice(2).padEnd(40, '0').slice(0, 40)}`
     }
-    // Bitcoin-like address (very rough demo format)
     if (['electrum', 'blue-wallet'].includes(walletId)) {
       return `bc1q${Math.random().toString(36).slice(2).padEnd(30, '0').slice(0, 30)}`
     }
-    // Lightning invoice / node id placeholder
     if (['lightning-wallet', 'phoenix'].includes(walletId)) {
       return `lnbc${Math.random().toString(36).slice(2).padEnd(20, '0').slice(0, 20)}`
     }
@@ -40,9 +42,8 @@ export const useWalletConnect = () => {
   }, [])
 
   const connectWallet = useCallback(
-    async (wallet: WalletProvider): Promise<{ address: string; walletName: string }> => {
+    async (wallet: WalletProvider): Promise<{ address: string; walletName: string; network?: string }> => {
       const { id: walletId, name: walletName } = wallet
-      let address: string | null = null
 
       // Freighter connection
       if (walletId === 'freighter') {
@@ -60,75 +61,50 @@ export const useWalletConnect = () => {
             address = generateMockAddress(walletId)
             return { address, walletName }
           }
-          address = generateMockAddress(walletId)
-          return { address, walletName }
         }
+        return { address: generateMockAddress(walletId), walletName }
       }
 
-      // Coinbase Wallet connection
-      else if (walletId === 'coinbase-wallet') {
-        if (!window.coinbaseWalletProvider) {
-          address = generateMockAddress(walletId)
-          return { address, walletName }
+      // Coinbase Wallet
+      if (walletId === 'coinbase-wallet') {
+        if (window.coinbaseWalletProvider) {
+          try {
+            const accounts = await window.coinbaseWalletProvider.request({ method: 'eth_requestAccounts' })
+            if (Array.isArray(accounts) && accounts.length > 0) {
+              return { address: accounts[0] as string, walletName }
+            }
+          } catch {
+            // fall through to mock
+          }
         }
-        try {
-          const accounts = await window.coinbaseWalletProvider.request({
-            method: 'eth_requestAccounts',
-          })
-          if (Array.isArray(accounts) && accounts.length > 0) {
-            address = accounts[0] as string
+        return { address: generateMockAddress(walletId), walletName }
+      }
+
+      // Trust Wallet
+      if (walletId === 'trust-wallet') {
+        if (window.ethereum) {
+          try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+            if (Array.isArray(accounts) && accounts.length > 0) {
+              return { address: accounts[0] as string, walletName }
+            }
+          } catch {
+            // fall through to mock
           }
-        } catch (error) {
-          if (error instanceof Error) {
-            address = generateMockAddress(walletId)
-            return { address, walletName }
-          }
-          address = generateMockAddress(walletId)
-          return { address, walletName }
         }
+        return { address: generateMockAddress(walletId), walletName }
       }
 
-      // Trust Wallet connection
-      else if (walletId === 'trust-wallet') {
-        // Trust Wallet often injects window.ethereum on mobile; don't hard-require isTrust.
-        try {
-          if (!window.ethereum) {
-            address = generateMockAddress(walletId)
-            return { address, walletName }
-          }
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-          if (Array.isArray(accounts) && accounts.length > 0) {
-            address = accounts[0] as string
-          }
-        } catch (error) {
-          if (error instanceof Error) {
-            address = generateMockAddress(walletId)
-            return { address, walletName }
-          }
-          address = generateMockAddress(walletId)
-          return { address, walletName }
-        }
-      }
-
-      // All other wallets: demo connect for now (so button + flow always works)
-      else {
-        address = generateMockAddress(walletId)
-        return { address, walletName }
-      }
-
-      if (!address) {
-        throw new Error('Failed to retrieve wallet address')
-      }
-
-      return { address, walletName }
+      // All other wallets: demo connect
+      return { address: generateMockAddress(walletId), walletName }
     },
     [generateMockAddress]
   )
 
   const storeAndNavigate = useCallback(
     (address: string, walletName: string) => {
-      localStorage.setItem('walletName', walletName)
-      localStorage.setItem('walletAddress', address)
+      walletSession.setName(walletName)
+      walletSession.setAddress(address)
       router.push(`/dashboard?wallet=${encodeURIComponent(walletName)}&address=${address}`)
     },
     [router]
