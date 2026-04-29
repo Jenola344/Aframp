@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Clock,
   Eye,
+  ExternalLink,
   Receipt,
   RefreshCcw,
   XCircle,
@@ -394,6 +395,14 @@ export function TransactionHistory() {
     return <XCircle className="h-4 w-4" />
   }
 
+  const getExplorerUrl = (txId: string) => {
+    return `https://verify.aframp.com/order/${txId}`
+  }
+
+  const handleViewTransaction = (txId: string) => {
+    window.open(getExplorerUrl(txId), '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -501,7 +510,14 @@ export function TransactionHistory() {
                         <div className="font-semibold text-foreground">
                           {typeConfig[tx.type].label}
                         </div>
-                        <div className="text-xs text-muted-foreground">{tx.id}</div>
+                        <button
+                          type="button"
+                          onClick={() => handleViewTransaction(tx.id)}
+                          className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors inline-flex items-center gap-1"
+                        >
+                          {tx.id}
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
                         <div className="mt-0.5 text-xs text-muted-foreground">
                           {tx.counterparty}
                         </div>
@@ -525,9 +541,15 @@ export function TransactionHistory() {
                     </Badge>
                   </td>
                   <td className="py-4">
-                    <Button variant="ghost" size="sm" className="h-9">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 gap-1.5"
+                      onClick={() => handleViewTransaction(tx.id)}
+                    >
                       <Eye className="h-4 w-4" />
                       View
+                      <ExternalLink className="h-3 w-3" />
                     </Button>
                   </td>
                 </motion.tr>
@@ -550,11 +572,13 @@ export function TransactionHistory() {
               className="relative overflow-hidden rounded-xl border border-border bg-card"
             >
               <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-2">
-                <Button size="sm" variant="outline" className="h-9 px-3">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 px-3"
+                  onClick={() => handleViewTransaction(tx.id)}
+                >
                   <Eye className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="outline" className="h-9 px-3">
-                  <RefreshCcw className="h-4 w-4" />
                 </Button>
               </div>
               <motion.div
@@ -576,7 +600,14 @@ export function TransactionHistory() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">{typeConfig[tx.type].label}</p>
-                      <p className="text-xs text-muted-foreground">{tx.id}</p>
+                      <button
+                        type="button"
+                        onClick={() => handleViewTransaction(tx.id)}
+                        className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors inline-flex items-center gap-1"
+                      >
+                        {tx.id}
+                        <ExternalLink className="h-3 w-3" />
+                      </button>
                       <p className="mt-0.5 text-xs text-muted-foreground">{tx.counterparty}</p>
                     </div>
                   </div>
