@@ -95,13 +95,54 @@ export function PaymentForm({ schema }: PaymentFormProps) {
       setValidatedAccount(null)
     }
   }, [accountValue, errors, primaryFieldName, validatedAccount])
-  const onSubmit = async (_data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setIsProcessing(false)
-    toast.success('Payment Successful!', {
-      description: `Your payment to ${schema.name} has been processed.`,
-    })
+    
+    try {
+      // Prepare payment data
+      const paymentData = {
+        billerId: schema.id,
+        billerName: schema.name,
+        accountNumber: data[primaryFieldName as keyof FormValues] as string,
+        amount: parsedAmount,
+        customerEmail: 'customer@example.com', // Should be collected from user
+        customerPhone: data.phoneNumber as string | undefined,
+        paymentMethod: paymentMethod,
+        gateway: 'paystack' as const, // Can be made dynamic
+        metadata: {
+          ...data,
+          validatedAccountName: validatedAccount,
+        },
+      }
+
+      // Initiate payment
+      const response = await fetch('/api/bills/initiate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to initiate payment')
+      }
+
+      const result = await response.json()
+
+      if (result.success && result.authorization_url) {
+        // Redirect to payment gateway
+        window.location.href = result.authorization_url
+      } else {
+        throw new Error('Invalid payment response')
+      }
+    } catch (error) {
+      console.error('Payment error:', error)
+      toast.error('Payment Failed', {
+        description: 'Unable to process payment. Please try again.',
+      })
+      setIsProcessing(false)
+    }
   }
 
   return (
