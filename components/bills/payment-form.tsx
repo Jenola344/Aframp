@@ -107,7 +107,7 @@ export function PaymentForm({ schema, countryCode }: PaymentFormProps) {
       setValidatedAccount(null)
     }
   }, [accountValue, errors, primaryFieldName, validatedAccount])
-  const onSubmit = async (_data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     setIsProcessing(true)
 
     try {
