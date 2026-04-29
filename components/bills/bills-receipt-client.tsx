@@ -47,7 +47,7 @@ async function qrSvgToDataUrl(svgEl: SVGSVGElement): Promise<string> {
 export function BillsReceiptClient({ transactionId }: BillsReceiptClientProps) {
   const searchParams = useSearchParams()
   const statusOverride = searchParams.get('status')
-  const { transaction, loading, error, statusLabel } = useBillsTransaction(
+  const { transaction, loading, error, statusLabel, fromCache } = useBillsTransaction(
     transactionId,
     process.env.NEXT_PUBLIC_BILLS_WS_URL,
     statusOverride
@@ -187,6 +187,12 @@ export function BillsReceiptClient({ transactionId }: BillsReceiptClientProps) {
   return (
     <div className="min-h-screen bg-background px-4 py-10">
       <div className="mx-auto max-w-4xl space-y-6">
+        {fromCache && (
+          <div className="flex items-center gap-2 rounded-xl border border-yellow-400/40 bg-yellow-400/10 px-4 py-3 text-sm text-yellow-700 dark:text-yellow-400">
+            <span>⚠️</span>
+            <span>You&apos;re offline — showing cached receipt. Some details may be outdated.</span>
+          </div>
+        )}
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-semibold text-primary">Bills Receipt</p>
