@@ -24,13 +24,23 @@ import { formatCurrency } from '@/lib/onramp/formatters'
 import { isValidStellarAddress } from '@/lib/onramp/validation'
 import type { OnrampOrder } from '@/types/onramp'
 import { Button } from '@/components/ui/button' // Added missing import for Button
+import { Skeleton } from '@/components/ui/skeleton'
 
 const ORDER_KEY = 'onramp:latest-order'
 
 export function OnrampPageClient() {
   const router = useRouter()
   const { isConnected: storeConnected, publicKey } = useWallet()
-  const { address, addresses, connected, loading, updateAddress, disconnect } =
+  const {
+    address,
+    addresses,
+    connected,
+    loading,
+    updateAddress,
+    setDefaultAddress,
+    removeAddress,
+    disconnect,
+  } =
     useWalletConnection()
   const walletConnected = Boolean(address) || connected || storeConnected || Boolean(publicKey)
   const [walletModalOpen, setWalletModalOpen] = useState(false)
@@ -134,6 +144,33 @@ export function OnrampPageClient() {
       if (!response.ok) {
         throw new Error('Failed to create order')
       }
+    // Apply referral discount (10% off fees) on first ramp
+    const referralCode = getAppliedReferralCode()
+    const hasDiscount = !!referralCode && !isReferralDiscountConsumed()
+    const reward = hasDiscount ? calcReferralDiscount(form.fees.totalFees) : null
+    const discountedFees = reward
+      ? { ...form.fees, totalFees: form.fees.totalFees - reward.discountAmount, totalCost: form.fees.totalCost - reward.discountAmount }
+      : form.fees
+
+    const order: OnrampOrder = {
+      id: `order-${Date.now()}`,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 15 * 60 * 1000,
+      fiatCurrency: form.state.fiatCurrency,
+      cryptoAsset: form.state.cryptoAsset,
+      paymentMethod: form.state.paymentMethod,
+      amount: form.amountValue,
+      exchangeRate: data?.rate || 1600, // Fallback rate for demo
+      cryptoAmount: form.cryptoAmount,
+      fees: discountedFees,
+      walletAddress: walletAddress,
+      status: 'created',
+    }
+
+    if (hasDiscount) markReferralDiscountConsumed()
+
+    localStorage.setItem(ORDER_KEY, JSON.stringify(order))
+    localStorage.setItem(`onramp:order:${order.id}`, JSON.stringify(order))
 
       const result = await response.json()
       const order: OnrampOrder = result.order
@@ -165,9 +202,9 @@ export function OnrampPageClient() {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-12">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 w-48 rounded-full bg-muted" />
-            <div className="h-64 rounded-3xl bg-muted" />
+          <div className="space-y-6">
+            <Skeleton className="h-8 w-48 rounded-full" />
+            <Skeleton className="h-64 rounded-3xl" />
           </div>
         </div>
       </div>
@@ -234,6 +271,8 @@ export function OnrampPageClient() {
             onSubmit={handleSubmit}
             onCopyWallet={handleCopy}
             onChangeWallet={updateAddress}
+            onSetDefaultWallet={setDefaultAddress}
+            onRemoveWallet={removeAddress}
             onDisconnectWallet={handleDisconnect}
             walletAddress={address}
             walletOptions={addresses}
@@ -273,13 +312,32 @@ export function OnrampPageClient() {
                     {formatCurrency(form.fees.networkFee, form.state.fiatCurrency)}
                   </span>
                 </div>
+                {!isReferralDiscountConsumed() && getAppliedReferralCode() && (
+                  <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                    <span>Referral discount (10%)</span>
+                    <span>
+                      −{formatCurrency(form.fees.totalFees * 0.1, form.state.fiatCurrency)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between border-t border-border pt-3 text-foreground">
                   <span>Total cost</span>
                   <span className="font-semibold">
-                    {formatCurrency(form.fees.totalCost, form.state.fiatCurrency)}
+                    {formatCurrency(
+                      !isReferralDiscountConsumed() && getAppliedReferralCode()
+                        ? form.fees.totalCost - form.fees.totalFees * 0.1
+                        : form.fees.totalCost,
+                      form.state.fiatCurrency
+                    )}
                   </span>
                 </div>
               </div>
+              <Link
+                href="/referral"
+                className="mt-4 block text-xs text-primary hover:underline"
+              >
+                🎁 Refer a friend → they get 10% off their first ramp
+              </Link>
             </div>
           </div>
         </div>

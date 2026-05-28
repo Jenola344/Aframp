@@ -29,6 +29,8 @@ interface OnrampCalculatorProps {
   onSubmit: () => void
   onCopyWallet: () => void
   onChangeWallet: (address: string) => void
+  onSetDefaultWallet: (address: string) => void
+  onRemoveWallet: (address: string) => void
   onDisconnectWallet: () => void
   walletAddress: string
   walletOptions: string[]
@@ -71,6 +73,8 @@ export function OnrampCalculator({
   onSubmit,
   onCopyWallet,
   onChangeWallet,
+  onSetDefaultWallet,
+  onRemoveWallet,
   onDisconnectWallet,
   walletAddress,
   walletOptions,
@@ -174,6 +178,8 @@ export function OnrampCalculator({
           addressOptions={walletOptions}
           onCopy={onCopyWallet}
           onChangeWallet={onChangeWallet}
+          onSetDefaultWallet={onSetDefaultWallet}
+          onRemoveWallet={onRemoveWallet}
           onDisconnect={onDisconnectWallet}
         />
 
