@@ -94,7 +94,9 @@ export function OnrampPageClient() {
     }
   }
 
-  const handleSubmit = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async () => {
     // For demo purposes, auto-connect a mock wallet if none exists
     let walletAddress = address
     if (!isValidStellarAddress(address)) {
@@ -103,30 +105,49 @@ export function OnrampPageClient() {
       walletAddress = mockAddress
     }
 
-    if (!form.isValid) {
+    if (!form.isValid || isSubmitting) {
       return
     }
 
-    const order: OnrampOrder = {
-      id: `order-${Date.now()}`,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 15 * 60 * 1000,
-      fiatCurrency: form.state.fiatCurrency,
-      cryptoAsset: form.state.cryptoAsset,
-      paymentMethod: form.state.paymentMethod,
-      amount: form.amountValue,
-      exchangeRate: data?.rate || 1600, // Fallback rate for demo
-      cryptoAmount: form.cryptoAmount,
-      fees: form.fees,
-      walletAddress: walletAddress,
-      status: 'created',
+    setIsSubmitting(true)
+
+    try {
+      const orderData = {
+        fiatCurrency: form.state.fiatCurrency,
+        cryptoAsset: form.state.cryptoAsset,
+        paymentMethod: form.state.paymentMethod,
+        amount: form.amountValue,
+        exchangeRate: data?.rate || 1600, // Fallback rate for demo
+        cryptoAmount: form.cryptoAmount,
+        fees: form.fees,
+        walletAddress: walletAddress,
+      }
+
+      const response = await fetch('/api/onramp/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create order')
+      }
+
+      const result = await response.json()
+      const order: OnrampOrder = result.order
+
+      localStorage.setItem(ORDER_KEY, JSON.stringify(order))
+      localStorage.setItem(`onramp:order:${order.id}`, JSON.stringify(order))
+
+      // Follow correct workflow: Calculator → Payment Instructions → Processing → Success
+      router.push(`/onramp/payment?order=${order.id}`)
+    } catch (err) {
+      console.error('Order creation failed:', err)
+    } finally {
+      setIsSubmitting(false)
     }
-
-    localStorage.setItem(ORDER_KEY, JSON.stringify(order))
-    localStorage.setItem(`onramp:order:${order.id}`, JSON.stringify(order))
-
-    // Follow correct workflow: Calculator → Payment Instructions → Processing → Success
-    router.push(`/onramp/payment?order=${order.id}`)
   }
 
   const handleDisconnect = () => {
@@ -221,6 +242,7 @@ export function OnrampPageClient() {
             balanceLabel={`Balance: ${formatCurrency(250000, form.state.fiatCurrency, 0)} available`}
             cryptoAmount={form.cryptoAmount}
             isCalculating={form.isCalculating}
+            isSubmitting={isSubmitting}
             isValid={form.isValid}
             fees={form.fees}
           />
