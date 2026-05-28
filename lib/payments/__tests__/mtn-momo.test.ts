@@ -2,7 +2,7 @@
  * Tests for the MTN MoMo Collections API integration.
  */
 
-import { MtnMomoProvider } from '../mtn-momo'
+import { MtnMomoProvider, _resetTokenCache } from '../mtn-momo'
 import { MobileMoneyError } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -41,7 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.restoreAllMocks()
-  jest.resetModules()
+  _resetTokenCache()
 })
 
 // ---------------------------------------------------------------------------
