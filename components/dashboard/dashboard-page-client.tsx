@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { KycDashboardGuard } from '@/components/kyc/kyc-dashboard-guard'
 
 interface DashboardPageClientProps {
   initialWallet?: string
@@ -50,7 +51,9 @@ export function DashboardPageClient({ initialWallet, initialAddress }: Dashboard
 
   return (
     <DashboardLayout walletAddress={walletAddress}>
-      <DashboardContent walletName={walletName} walletAddress={walletAddress} />
+      <KycDashboardGuard>
+        <DashboardContent walletName={walletName} walletAddress={walletAddress} />
+      </KycDashboardGuard>
     </DashboardLayout>
   )
 }
