@@ -93,22 +93,19 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.14.0
 
-      - name: Start production server
-        run: npm start &
+      - name: Start server and run Lighthouse CI
+        run: |
+          npm start &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000 > /dev/null 2>&1 && echo "Server ready after ${i}s" && break
+            sleep 2
+          done
+          lhci autorun
+          kill $SERVER_PID 2>/dev/null || true
         env:
           PORT: 3000
-
-      - name: Wait for server
-        run: |
-          for i in $(seq 1 20); do
-            curl -sf http://localhost:3000 > /dev/null && echo "Server ready" && break
-            echo "Waiting... ($i/20)"
-            sleep 3
-          done
-
-      - name: Run Lighthouse CI
-        run: lhci autorun
-        env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: Upload Lighthouse results
