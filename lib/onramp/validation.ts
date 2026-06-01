@@ -1,5 +1,5 @@
 import type { FiatCurrency } from '@/types/onramp'
-import { formatCurrency } from '@/lib/onramp/formatters'
+import { formatCurrency } from '@/lib/calculations'
 
 const limitsMap: Record<FiatCurrency, { min: number; max: number }> = {
   NGN: { min: 1000, max: 500000 },
