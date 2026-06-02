@@ -44,6 +44,12 @@ export const metadata: Metadata = {
     'Aframp',
   ],
   generator: 'v0.app',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Aframp',
+  },
 }
 
 export const viewport: Viewport = {

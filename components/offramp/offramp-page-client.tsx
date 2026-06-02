@@ -11,7 +11,7 @@ import { useOfframpRate } from '@/hooks/use-offramp-rate'
 import { useOfframpForm } from '@/hooks/use-offramp-form'
 import { useOfframpBalances } from '@/hooks/use-offramp-balances'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatCurrency } from '@/lib/onramp/formatters'
+import { formatCurrency } from '@/lib/calculations'
 import { formatUsd, formatRateCountdown } from '@/lib/offramp/formatters'
 import type { OfframpOrder } from '@/types/offramp'
 

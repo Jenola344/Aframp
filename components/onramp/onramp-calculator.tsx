@@ -7,7 +7,7 @@ import { ExchangeRateDisplay } from '@/components/onramp/exchange-rate-display'
 import { PaymentMethodCard } from '@/components/onramp/payment-method-card'
 import { WalletDisplay } from '@/components/onramp/wallet-display'
 import { Button } from '@/components/ui/button'
-import { formatCurrency, formatNumber } from '@/lib/onramp/formatters'
+import { formatCurrency, formatNumber } from '@/lib/calculations'
 import { PaymentMethodGlyph } from '@/components/icons/finance-icons'
 import type { CryptoAsset, FiatCurrency, PaymentMethod } from '@/types/onramp'
 
