@@ -39,6 +39,7 @@ interface OnrampCalculatorProps {
   balanceLabel?: string
   cryptoAmount: number
   isCalculating: boolean
+  isSubmitting?: boolean
   isValid: boolean
   fees: {
     processingFee: number
@@ -82,6 +83,7 @@ export function OnrampCalculator({
   balanceLabel,
   cryptoAmount,
   isCalculating,
+  isSubmitting,
   isValid,
   fees,
 }: OnrampCalculatorProps) {
@@ -209,12 +211,13 @@ export function OnrampCalculator({
           <Button
             size="lg"
             className="w-full rounded-full text-base"
-            disabled={!isValid || exchangeLoading}
+            disabled={!isValid || exchangeLoading || isSubmitting}
             type="submit"
-            onClick={onSubmit}
           >
-            {exchangeLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Continue to Payment →
+            {exchangeLoading || isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isSubmitting ? 'Creating Order...' : 'Continue to Payment →'}
           </Button>
         </div>
       </form>
