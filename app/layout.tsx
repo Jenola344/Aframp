@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Manrope, Outfit, Space_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { KycProvider } from '@/contexts/kyc-context'
 import './globals.css'
 
 const manrope = Manrope({
@@ -75,7 +76,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <KycProvider>
+            {children}
+          </KycProvider>
         </ThemeProvider>
         <Analytics />
       </body>
