@@ -10,14 +10,14 @@ const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-manrope',
   display: 'swap',
-  preload: false,
+  preload: true,
 })
 
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-cal-sans',
   display: 'swap',
-  preload: false,
+  preload: true,
 })
 
 const spaceMono = Space_Mono({
@@ -43,12 +43,19 @@ export const metadata: Metadata = {
     'fintech',
     'Aframp',
   ],
-  generator: 'v0.app',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Aframp',
+  generator: 'Next.js',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  openGraph: {
+    title: 'Aframp - Buy Crypto, Pay Bills & Send Money in Africa',
+    description:
+      "Africa's premier cNGN stablecoin payment platform. Buy crypto from ₦2,000, pay bills instantly, and send money across 12 African countries.",
+    type: 'website',
+    locale: 'en_NG',
+    siteName: 'Aframp',
   },
 }
 
