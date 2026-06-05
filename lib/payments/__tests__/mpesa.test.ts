@@ -2,7 +2,7 @@
  * Tests for the M-Pesa STK Push integration.
  */
 
-import { MpesaProvider } from '../mpesa'
+import { MpesaProvider, _resetTokenCache } from '../mpesa'
 import { MobileMoneyError } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -44,8 +44,7 @@ beforeEach(() => {
 afterEach(() => {
   jest.useRealTimers()
   jest.restoreAllMocks()
-  // Reset token cache between tests
-  jest.resetModules()
+  _resetTokenCache()
 })
 
 // ---------------------------------------------------------------------------
