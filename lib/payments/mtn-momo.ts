@@ -42,6 +42,9 @@ interface TokenCache {
 
 let tokenCache: TokenCache | null = null
 
+/** Exposed for tests only — resets the cached OAuth token. */
+export function _resetTokenCache() { tokenCache = null }
+
 async function fetchAccessToken(): Promise<string> {
   const now = Date.now()
   if (tokenCache && tokenCache.expiresAt > now + 30_000) {

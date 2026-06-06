@@ -45,6 +45,9 @@ beforeEach(() => {
 afterEach(() => {
   jest.useRealTimers()
   jest.restoreAllMocks()
+
+  _resetTokenCache()
+
 })
 
 // ---------------------------------------------------------------------------

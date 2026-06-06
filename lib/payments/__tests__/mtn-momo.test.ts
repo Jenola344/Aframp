@@ -42,7 +42,7 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.restoreAllMocks()
-  jest.resetModules()
+  _resetTokenCache()
 })
 
 // ---------------------------------------------------------------------------

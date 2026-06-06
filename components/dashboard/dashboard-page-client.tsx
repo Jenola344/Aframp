@@ -7,6 +7,7 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { useWallet } from '@/hooks/useWallet'
 import { walletSession } from '@/lib/wallet/session'
+import { KycDashboardGuard } from '@/components/kyc/kyc-dashboard-guard'
 
 interface DashboardPageClientProps {
   initialWallet?: string
@@ -71,7 +72,9 @@ export function DashboardPageClient({ initialWallet, initialAddress }: Dashboard
 
   return (
     <DashboardLayout walletAddress={walletAddress}>
-      <DashboardContent walletName={walletName} walletAddress={walletAddress} />
+      <KycDashboardGuard>
+        <DashboardContent walletName={walletName} walletAddress={walletAddress} />
+      </KycDashboardGuard>
     </DashboardLayout>
   )
 }
