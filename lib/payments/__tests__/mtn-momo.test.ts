@@ -33,6 +33,7 @@ const BASE_PARAMS = {
 }
 
 beforeEach(() => {
+  _resetTokenCache()
   process.env.MTN_MOMO_SUBSCRIPTION_KEY = 'test-sub-key'
   process.env.MTN_MOMO_API_USER = '550e8400-e29b-41d4-a716-446655440000'
   process.env.MTN_MOMO_API_KEY = 'test-api-key'

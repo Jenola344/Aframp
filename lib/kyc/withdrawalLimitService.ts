@@ -66,15 +66,25 @@ export const _withdrawalStore = new Map<string, WithdrawalRecord[]>()
 const _userLocks = new Map<string, Promise<unknown>>()
 
 function _acquireLock(userId: string): { release: () => void; ready: Promise<void> } {
-  let release!: () => void
-  // Build the inner lock promise first so `release` is assigned synchronously
-  // before the outer `ready` promise resolves.
-  const lockHeld = new Promise<void>((r) => { release = r })
-  const prev = _userLocks.get(userId) ?? Promise.resolve()
-  const next = prev.then(() => lockHeld)
-  _userLocks.set(userId, next)
-  const ready = prev.then(() => {}) // resolves when it's our turn
-  return { ready, release }
+  let releaseFn: () => void = () => {}
+  const ready = new Promise<void>((resolve) => {
+    const prev = _userLocks.get(userId) ?? Promise.resolve()
+    _userLocks.set(
+      userId,
+      prev.then(() => {
+        resolve()
+        return new Promise<void>((r) => {
+          releaseFn = r
+        })
+      })
+    )
+  })
+  return {
+    ready,
+    release: () => {
+      releaseFn()
+    },
+  }
 }
 
 // ---------------------------------------------------------------------------
