@@ -9,6 +9,11 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    cpus: 1,
+    staticGenerationMaxConcurrency: 1,
+    staticGenerationMinPagesPerWorker: 1,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

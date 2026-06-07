@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import type { KycInitiateResponse, KycSubmission } from '@/types/kyc'
-
-// In-memory store for KYC submissions (replace with DB in production)
-const kycStore = new Map<string, KycSubmission>()
+import type { KycSubmission } from '@/types/kyc'
+import { kycStore } from '@/lib/kyc/store'
 
 const bodySchema = z.object({
   idFront: z.string().min(100, 'ID front image is required'),
@@ -15,7 +13,7 @@ function generateSubmissionId(): string {
   return `kyc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<KycInitiateResponse>> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   let body: unknown
   try {
     body = await request.json()
@@ -111,6 +109,3 @@ function simulateVerification(submissionId: string): void {
     kycStore.set(submissionId, submission)
   }, delay)
 }
-
-// Export for testing
-export { kycStore }

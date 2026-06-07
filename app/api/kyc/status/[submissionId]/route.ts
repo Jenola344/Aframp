@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { KycStatusResponse } from '@/types/kyc'
-import { kycStore } from '../initiate/route'
+import { kycStore } from '@/lib/kyc/store'
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ submissionId: string }> }
-): Promise<NextResponse<KycStatusResponse>> {
+): Promise<NextResponse> {
   const { submissionId } = await context.params
 
   if (!submissionId) {

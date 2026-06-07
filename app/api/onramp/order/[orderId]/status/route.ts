@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server'
-import type { OrderStatus } from '@/types/onramp'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function PATCH(request: Request, { params }: { params: { orderId: string } }) {
-  const { orderId } = params
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ orderId: string }> }
+) {
+  const { orderId } = await context.params
 
   try {
     const { status, additionalData } = await request.json()

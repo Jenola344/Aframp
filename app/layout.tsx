@@ -1,32 +1,9 @@
 import type React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Manrope, Outfit, Space_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { KycProvider } from '@/contexts/kyc-context'
 import './globals.css'
-
-const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-manrope',
-  display: 'swap',
-  preload: true,
-})
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-cal-sans',
-  display: 'swap',
-  preload: true,
-})
-
-const spaceMono = Space_Mono({
-  weight: ['400', '700'],
-  subsets: ['latin'],
-  variable: '--font-instrument-sans',
-  display: 'swap',
-  preload: false,
-})
 
 export const metadata: Metadata = {
   title: 'Aframp - Buy Crypto, Pay Bills & Send Money in Africa',
@@ -71,10 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${manrope.variable} ${outfit.variable} ${spaceMono.variable} font-sans antialiased`}
-        suppressHydrationWarning
-      >
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <KycProvider>
             {children}

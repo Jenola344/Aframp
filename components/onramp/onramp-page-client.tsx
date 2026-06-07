@@ -121,14 +121,27 @@ export function OnrampPageClient() {
     setIsSubmitting(true)
 
     try {
+      // Apply referral discount (10% off fees) on first ramp
+      const referralCode = getAppliedReferralCode()
+      const hasDiscount = !!referralCode && !isReferralDiscountConsumed()
+      const reward = hasDiscount ? calcReferralDiscount(form.fees.totalFees) : null
+      const discountedFees = reward
+        ? {
+            ...form.fees,
+            totalFees: form.fees.totalFees - reward.discountAmount,
+            totalCost: form.fees.totalCost - reward.discountAmount,
+          }
+        : form.fees
+
       const orderData = {
+        id: `order-${Date.now()}`,
         fiatCurrency: form.state.fiatCurrency,
         cryptoAsset: form.state.cryptoAsset,
         paymentMethod: form.state.paymentMethod,
         amount: form.amountValue,
         exchangeRate: data?.rate || 1600, // Fallback rate for demo
         cryptoAmount: form.cryptoAmount,
-        fees: form.fees,
+        fees: discountedFees,
         walletAddress: walletAddress,
       }
 
@@ -143,36 +156,11 @@ export function OnrampPageClient() {
       if (!response.ok) {
         throw new Error('Failed to create order')
       }
-    // Apply referral discount (10% off fees) on first ramp
-    const referralCode = getAppliedReferralCode()
-    const hasDiscount = !!referralCode && !isReferralDiscountConsumed()
-    const reward = hasDiscount ? calcReferralDiscount(form.fees.totalFees) : null
-    const discountedFees = reward
-      ? { ...form.fees, totalFees: form.fees.totalFees - reward.discountAmount, totalCost: form.fees.totalCost - reward.discountAmount }
-      : form.fees
-
-    const order: OnrampOrder = {
-      id: `order-${Date.now()}`,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 15 * 60 * 1000,
-      fiatCurrency: form.state.fiatCurrency,
-      cryptoAsset: form.state.cryptoAsset,
-      paymentMethod: form.state.paymentMethod,
-      amount: form.amountValue,
-      exchangeRate: data?.rate || 1600, // Fallback rate for demo
-      cryptoAmount: form.cryptoAmount,
-      fees: discountedFees,
-      walletAddress: walletAddress,
-      status: 'created',
-    }
-
-    if (hasDiscount) markReferralDiscountConsumed()
-
-    localStorage.setItem(ORDER_KEY, JSON.stringify(order))
-    localStorage.setItem(`onramp:order:${order.id}`, JSON.stringify(order))
 
       const result = await response.json()
       const order: OnrampOrder = result.order
+
+      if (hasDiscount) markReferralDiscountConsumed()
 
       localStorage.setItem(ORDER_KEY, JSON.stringify(order))
       localStorage.setItem(`onramp:order:${order.id}`, JSON.stringify(order))

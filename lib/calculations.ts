@@ -1,4 +1,11 @@
-import type { FiatCurrency } from '@/types/onramp'
+export {
+  formatAmountInput,
+  formatCurrency,
+  formatNumber,
+  formatRate,
+  parseAmountInput,
+  truncateAddress,
+} from '@/lib/onramp/formatters'
 
 export function isValidStellarAddress(address: string) {
   if (!address) return false

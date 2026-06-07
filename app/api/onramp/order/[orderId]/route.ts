@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server'
-import type { OnrampOrder } from '@/types/onramp'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: Request, { params }: { params: { orderId: string } }) {
-  const { orderId } = params
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ orderId: string }> }
+) {
+  const { orderId } = await context.params
 
   try {
     // In a real application, you would fetch from a database
