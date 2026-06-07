@@ -33,6 +33,7 @@ const BASE_PARAMS = {
 }
 
 beforeEach(() => {
+  _resetTokenCache()
   process.env.MPESA_CONSUMER_KEY = 'test-key'
   process.env.MPESA_CONSUMER_SECRET = 'test-secret'
   process.env.MPESA_SHORTCODE = '174379'
@@ -44,7 +45,9 @@ beforeEach(() => {
 afterEach(() => {
   jest.useRealTimers()
   jest.restoreAllMocks()
+
   _resetTokenCache()
+
 })
 
 // ---------------------------------------------------------------------------
