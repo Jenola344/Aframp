@@ -1,20 +1,19 @@
-import { Suspense } from 'react'
-import { VerifyPaymentClient } from '@/components/bills/verify-payment-client'
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
+import { VerifyPaymentClient } from '@/components/bills/verify-payment-client'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
-export default function VerifyPaymentPage() {
 function VerifyPaymentContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying')
   const [transactionId, setTransactionId] = useState<string | null>(null)
+
 
   useEffect(() => {
     const reference = searchParams.get('reference')
@@ -38,6 +37,7 @@ function VerifyPaymentContent() {
           setTimeout(() => {
             router.push(`/bills/receipt/${data.reference}`)
           }, 2000)
+
         } else {
           setStatus('failed')
         }
@@ -51,30 +51,31 @@ function VerifyPaymentContent() {
   }, [searchParams, router])
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-card border border-border rounded-3xl p-8 text-center space-y-6">
-            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Verifying Payment</h1>
-              <p className="text-muted-foreground mt-2">
-                Please wait while we confirm your payment...
-              </p>
+    <>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-background flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-card border border-border rounded-3xl p-8 text-center space-y-6">
+              <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Verifying Payment</h1>
+                <p className="text-muted-foreground mt-2">
+                  Please wait while we confirm your payment...
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      }
-    >
-      <VerifyPaymentClient />
-    </Suspense>
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="max-w-md w-full bg-card border border-border rounded-3xl p-8 text-center space-y-6"
-    >
+        }
+      >
+        <VerifyPaymentClient />
+      </Suspense>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md w-full bg-card border border-border rounded-3xl p-8 text-center space-y-6"
+      >
       {status === 'verifying' && (
         <>
           <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -133,6 +134,7 @@ function VerifyPaymentContent() {
         </>
       )}
     </motion.div>
+    </>
   )
 }
 
