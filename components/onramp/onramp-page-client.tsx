@@ -24,6 +24,13 @@ import { formatCurrency, isValidStellarAddress } from '@/lib/calculations'
 import type { OnrampOrder } from '@/types/onramp'
 import { Button } from '@/components/ui/button' // Added missing import for Button
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  getAppliedReferralCode,
+  isReferralDiscountConsumed,
+  calcReferralDiscount,
+  markReferralDiscountConsumed,
+  setAppliedReferralCode,
+} from '@/lib/referral'
 
 const ORDER_KEY = 'onramp:latest-order'
 
@@ -73,6 +80,15 @@ export function OnrampPageClient() {
   useEffect(() => {
     router.prefetch('/onramp/payment')
   }, [router])
+
+  // Process referral code from URL query param (e.g. /onramp?ref=AFR-ABCD-1234)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const refCode = params.get('ref')
+    if (refCode && !getAppliedReferralCode() && !isReferralDiscountConsumed()) {
+      setAppliedReferralCode(refCode.toUpperCase())
+    }
+  }, [])
 
   // Only show modal if definitely not connected after loading
   useEffect(() => {
@@ -143,6 +159,7 @@ export function OnrampPageClient() {
         cryptoAmount: form.cryptoAmount,
         fees: discountedFees,
         walletAddress: walletAddress,
+        referralCode: hasDiscount ? referralCode : undefined,
       }
 
       const response = await fetch('/api/onramp/create-order', {
