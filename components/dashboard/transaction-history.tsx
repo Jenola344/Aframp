@@ -31,6 +31,7 @@ import {
 } from 'recharts'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { EmptyStateIllustration } from '@/components/ui/empty-state-illustration'
 import { cn } from '@/lib/utils'
 
 const TransactionChart = dynamic(
@@ -450,6 +451,13 @@ export function TransactionHistory() {
     setPage(1)
   }
 
+  const clearFilters = () => {
+    setQuickFilter('all')
+    setStatusFilter('all')
+    setPeriodFilter('30d')
+    setPage(1)
+  }
+
   const volumeChartData = useMemo(() => {
     const grouped = filteredTransactions.reduce<Record<string, number>>((acc, tx) => {
       const label = new Intl.DateTimeFormat('en-US', {
@@ -558,6 +566,22 @@ export function TransactionHistory() {
         </div>
       </Suspense>
 
+      {sortedTransactions.length === 0 && (
+        <div className="py-16 flex flex-col items-center gap-4 text-center">
+          <EmptyStateIllustration variant="search" />
+          <div>
+            <p className="font-semibold text-foreground">No matching transactions</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Try adjusting your filters to see results
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        </div>
+      )}
+
+      {sortedTransactions.length > 0 && (<>
       {/* Desktop table — paginated (≤50) or virtualized (>50) */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[820px]">
@@ -828,9 +852,9 @@ export function TransactionHistory() {
           </div>
         )}
       </div>
+      </>)}
 
-
-      {!isVirtualized && (
+      {!isVirtualized && sortedTransactions.length > 0 && (
         <div className="mt-4">
           <Pagination
             currentPage={currentPage}
