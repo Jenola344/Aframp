@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { KycProvider } from '@/contexts/kyc-context'
+import CookieConsentBanner from '@/components/CookieConsentBanner'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -54,6 +55,7 @@ export default function RootLayout({
             {children}
           </KycProvider>
         </ThemeProvider>
+        <CookieConsentBanner />
         <Analytics />
       </body>
     </html>
