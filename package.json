@@ -15,7 +15,11 @@
     "format:check": "prettier --check \"app/bills/pay/[billerId]/page.tsx\" \"components/bills/payment-form.tsx\" \"components/bills/recent-billers.tsx\" \"components/dashboard/transaction-history.tsx\" \"lib/biller-schemas.ts\" \"package.json\"",
     "type-check": "tsc --noEmit",
     "prepare": "husky install || true",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "security:audit": "npm audit --audit-level=high",
+    "security:owasp": "bash scripts/owasp-scan.sh",
+    "security:wallet": "bash scripts/audit-wallet-deps.sh",
+    "security:all": "npm run security:audit && npm run security:owasp && npm run security:wallet"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -36,6 +40,7 @@
     "@radix-ui/react-switch": "1.1.2",
     "@radix-ui/react-tabs": "1.1.2",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@sentry/nextjs": "^10.62.0",
     "@stellar/freighter-api": "^6.0.1",
     "@stellar/stellar-sdk": "^14.5.0",
     "@upstash/ratelimit": "2.0.5",

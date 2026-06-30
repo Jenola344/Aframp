@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { KycProvider } from '@/contexts/kyc-context'
+import SentryErrorBoundary from '@/components/error/SentryErrorBoundary'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -50,9 +51,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <KycProvider>
-            {children}
-          </KycProvider>
+          <SentryErrorBoundary>
+            <KycProvider>
+              {children}
+            </KycProvider>
+          </SentryErrorBoundary>
         </ThemeProvider>
         <Analytics />
       </body>
