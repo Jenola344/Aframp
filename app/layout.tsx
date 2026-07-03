@@ -51,9 +51,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <KycProvider>
-            {children}
-          </KycProvider>
+          <SentryErrorBoundary>
+            <KycProvider>
+              {children}
+            </KycProvider>
+          </SentryErrorBoundary>
         </ThemeProvider>
         <CookieConsentBanner />
         <Analytics />

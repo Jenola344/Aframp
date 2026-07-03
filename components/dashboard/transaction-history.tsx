@@ -32,6 +32,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { EmptyStateIllustration } from '@/components/ui/empty-state-illustration'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 const TransactionChart = dynamic(
@@ -308,7 +309,7 @@ function useVirtualList<T>(items: T[], rowHeight: number, containerHeight: numbe
   return { visibleItems, totalHeight: items.length * rowHeight, setScrollTop }
 }
 
-export function TransactionHistory() {
+export function TransactionHistory({ loading = false }: { loading?: boolean } = {}) {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('30d')
@@ -566,7 +567,23 @@ export function TransactionHistory() {
         </div>
       </Suspense>
 
-      {sortedTransactions.length === 0 && (
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
+              <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+              <div className="text-right space-y-2">
+                <Skeleton className="h-4 w-24 ml-auto" />
+                <Skeleton className="h-5 w-20 ml-auto" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : sortedTransactions.length === 0 && (
         <div className="py-16 flex flex-col items-center gap-4 text-center">
           <EmptyStateIllustration variant="search" />
           <div>
@@ -581,7 +598,7 @@ export function TransactionHistory() {
         </div>
       )}
 
-      {sortedTransactions.length > 0 && (<>
+      {!loading && sortedTransactions.length > 0 && (<>
       {/* Desktop table — paginated (≤50) or virtualized (>50) */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[820px]">
